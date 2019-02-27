@@ -1,0 +1,15 @@
+{
+  "name": "taxi-metrics-api",
+  "version": "1.0.0",
+  "description": "API for accessing taxi data",
+  "main": "index.js",
+  "dependencies": {
+    "tedious": "^5.0.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Austin Diviness",
+  "license": "ISC"
+}
