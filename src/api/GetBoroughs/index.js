@@ -23,7 +23,6 @@ module.exports = function (context, req) {
 
     connection.on('connect', function(err) {
         if (err) {
-            console.log(err);
             error(err);
         }
         else {
@@ -39,7 +38,6 @@ module.exports = function (context, req) {
                                   function(err, rowCount, rows)
         {
             if (err) {
-                console.log(err);
                 error(err);
             }
             else {
@@ -62,6 +60,7 @@ module.exports = function (context, req) {
     // Arguments:
     // - err - the error that occurred.
     function error(err) {
+        context.log(err);
         context.res = {
             body: err,
             status: 500
