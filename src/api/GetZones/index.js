@@ -2,7 +2,7 @@
 // Description:
 // - returns json encoded listing of unique zones in all boroughs.
 // Arguments:
-// - borough - if present, will return zones from only specified borough
+// - borough - if present, will return zones from only specified borough (optional)
 module.exports = function (context, req) {
 
     var common = require('../common.js');
@@ -11,18 +11,17 @@ module.exports = function (context, req) {
     var Connection = require('tedious').Connection;
     var connection = new Connection(config);
 
-    connection.on('connect', function(err)
-                  {
-                      if (err) {
-                          common.error(err, context);
-                      }
-                      else if (req.query.borough) {
-                          queryBoroughZones(req.query.borough);
-                      }
-                      else {
-                          queryUniqueZones();
-                      }
-                  });
+    connection.on('connect', function(err) {
+        if (err) {
+            common.error(err, context);
+        }
+        else if (req.query.borough) {
+            queryBoroughZones(req.query.borough);
+        }
+        else {
+            queryUniqueZones();
+        }
+    });
 
     // Description:
     // - get list of all unique zones in all boroughs
@@ -30,8 +29,7 @@ module.exports = function (context, req) {
         common.query(context,
                      connection,
                      "select distinct zone from Zones",
-                     function(columns)
-                     {
+                     function(columns) {
                          return columns[0].value;
                      });
     }
