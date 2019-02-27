@@ -3,22 +3,10 @@
 // - returns json encoded listing of all unique boroughs
 module.exports = function (context, req) {
 
-    connection_setting = process.env["blah"];
+    var common = require('../common.js');
+    var config = common.getConfig();
 
-    var tedious = require('tedious');
-    var Connection = tedious.Connection;
-    var Request = tedious.Request;
-
-    var config = {
-        userName: process.env["DbUsername"],
-        password: process.env["DbPassword"],
-        server: process.env["DbServer"],
-        options: {
-            database: process.env["DbDatabase"],
-            encrypt: true,
-        }
-    };
-
+    var Connection = require('tedious').Connection;
     var connection = new Connection(config);
 
     connection.on('connect', function(err) {
@@ -33,38 +21,11 @@ module.exports = function (context, req) {
     // Description:
     // - get list of boroughs from database and return to caller
     function queryBoroughs() {
-        boroughs = [];
-        var request = new Request("select distinct borough from Zones",
-                                  function(err, rowCount, rows)
-        {
-            if (err) {
-                error(err);
-            }
-            else {
-                context.res = {
-                    body: JSON.stringify(boroughs),
-                    headers: { "Content-Type": "application/json" }
-                };
-                context.done();
-            }
-        });
-
-        request.on('row', function(columns) {
-            boroughs.push(columns[0].value);
-        });
-        connection.execSql(request);
-    }
-
-    // Description:
-    // - report error code back to caller
-    // Arguments:
-    // - err - the error that occurred.
-    function error(err) {
-        context.log(err);
-        context.res = {
-            body: err,
-            status: 500
-        }
-        context.done();
-    }
+        common.query(context,
+                     connection,
+                     "select distinct borough from Zones",
+                     function(columns) {
+                         return columns[0].value;
+                     });
+    };
 };
