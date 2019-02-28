@@ -1,7 +1,7 @@
 'use-strict';
 
 // Description:
-// tests for GetBoroughs api
+// tests for Boroughs api
 
 
 const apiEndpoint = require('./index.js');

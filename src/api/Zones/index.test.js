@@ -1,7 +1,7 @@
 'use-strict';
 
 // Description:
-// tests for GetZones api
+// tests for Zones api
 
 
 const apiEndpoint = require('./index.js');
