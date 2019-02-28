@@ -13,27 +13,29 @@ module.exports = function (context, req) {
     // verify that we have the required arguments
     if (!req.query.pickup)
     {
-        common.error("pickup param missing!", context);
+        common.error("pickup param missing!", context, 400);
     }
     if (!req.query.dropoff)
     {
-        common.error("dropoff param missing!", context);
+        common.error("dropoff param missing!", context, 400);
     }
     if (!req.query.ride)
     {
-        common.error("ride param missing!", context);
+        common.error("ride param missing!", context, 400);
     }
 
     // verify that arguments have valid values
     const ride = req.query.ride;
     if (!['green', 'yellow'].includes(ride))
     {
-        common.error("ride param is invalid!", context);
+        common.error("ride param is invalid!", context, 400);
     }
 
     const config = common.getConfig();
     const Connection = require('tedious').Connection;
     let connection = new Connection(config);
+
+    common.hookContextDoneWithConnectionClose(context, connection);
 
     connection.on('connect', function(err) {
         context.log("conection")
