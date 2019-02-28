@@ -37,11 +37,12 @@ function hookContextDoneWithConnectionClose(context, connection) {
 // Arguments:
 // - err - the error that occurred.
 // - context - the context for the request
-function error(err, context) {
+// - status - the http status code to return. defaults to 500.
+function error(err, context, status = 500) {
     context.log(err);
     context.res = {
         body: err,
-        status: 500
+        status: status
     }
     context.done();
 }
