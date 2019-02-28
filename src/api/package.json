@@ -6,9 +6,11 @@
   "dependencies": {
     "tedious": "^5.0.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^24.1.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Austin Diviness",
   "license": "ISC"
