@@ -12,6 +12,8 @@ module.exports = function (context, req) {
     const Connection = require('tedious').Connection;
     let connection = new Connection(config);
 
+    common.hookContextDoneWithConnectionClose(context, connection);
+
     connection.on('connect', function(err) {
         if (err) {
             common.error(err, context);

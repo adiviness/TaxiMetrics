@@ -11,7 +11,7 @@ beforeAll(() => {
     testUtils.injectLocalSettings();
 });
 
-test('GetBoroughs should return valid result code', done => {
+test('GetBoroughs should return valid response data', done => {
     let context = testUtils.context();
     let request = {};
 
