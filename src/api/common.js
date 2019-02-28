@@ -1,3 +1,5 @@
+'use-strict';
+
 // Description:
 // - Utilities that are common amoung the various api endpoints
 
@@ -39,9 +41,9 @@ function error(err, context) {
 // data intended to be aggragated for context return.
 // Note : rowProcessFunc :: Row -> a
 function query(context, connection, queryString, rowProcessFunc) {
-    var Request = require('tedious').Request;
-    data = [];
-    var request = new Request(queryString, function(err, rowCount, rows) {
+    const Request = require('tedious').Request;
+    let data = [];
+    let request = new Request(queryString, function(err, rowCount, rows) {
         if (err) {
             error(err, context);
         }

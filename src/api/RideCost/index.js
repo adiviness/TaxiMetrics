@@ -1,3 +1,4 @@
+'use-strict';
 
 // Description:
 // - returns json encoded listing of costs of a particular type
@@ -7,9 +8,9 @@
 // - dropoff - dropoff location zone
 module.exports = function (context, req) {
 
-    var common = require('../common.js');
+    const common = require('../common.js');
 
-    // verify that we have valid arguments
+    // verify that we have the required arguments
     if (!req.query.pickup)
     {
         common.error("pickup param missing!", context);
@@ -22,15 +23,17 @@ module.exports = function (context, req) {
     {
         common.error("ride param missing!", context);
     }
-    var ride = req.query.ride;
+
+    // verify that arguments have valid values
+    const ride = req.query.ride;
     if (!['green', 'yellow'].includes(ride))
     {
         common.error("ride param is invalid!", context);
     }
 
-    var config = common.getConfig();
-    var Connection = require('tedious').Connection;
-    var connection = new Connection(config);
+    const config = common.getConfig();
+    const Connection = require('tedious').Connection;
+    let connection = new Connection(config);
 
     connection.on('connect', function(err) {
         context.log("conection")
@@ -45,9 +48,9 @@ module.exports = function (context, req) {
     // Description:
     // - build query based on request params
     function buildQuery() {
-        var pickup = req.query.pickup;
-        var dropoff = req.query.dropoff;
-        var table = "badTable";
+        const pickup = req.query.pickup;
+        const dropoff = req.query.dropoff;
+        let table = "badTable";
 
         switch (ride)
         {
@@ -73,10 +76,10 @@ dropoff_location_id =
     // - get list of taxi costs between provided locations
     function queryCost() {
         common.query(context,
-                        connection,
-                        buildQuery(),
-                        function(columns) {
-                            return columns[0].value;
-                        });
+                     connection,
+                     buildQuery(),
+                     function(columns) {
+                         return columns[0].value;
+                     });
     }
 };

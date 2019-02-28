@@ -1,3 +1,4 @@
+'use-strict';
 
 // Description:
 // - returns json encoded listing of unique zones in all boroughs.
@@ -5,11 +6,11 @@
 // - borough - if present, will return zones from only specified borough (optional)
 module.exports = function (context, req) {
 
-    var common = require('../common.js');
-    var config = common.getConfig();
+    const common = require('../common.js');
+    const config = common.getConfig();
 
-    var Connection = require('tedious').Connection;
-    var connection = new Connection(config);
+    const Connection = require('tedious').Connection;
+    let connection = new Connection(config);
 
     connection.on('connect', function(err) {
         if (err) {
