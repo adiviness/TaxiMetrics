@@ -18,6 +18,21 @@ function getConfig() {
 }
 
 // Description:
+// - hooks the context.done() function with closing the database connection first
+// Arguments:
+// - context - the context to hook
+// - connection - the connection to close
+function hookContextDoneWithConnectionClose(context, connection) {
+    let doneFn = context.done;
+    context.done = function() {
+        context.log("closing connection");
+        connection.close();
+        doneFn();
+    }
+}
+
+
+// Description:
 // - report error code back to caller
 // Arguments:
 // - err - the error that occurred.
@@ -49,6 +64,7 @@ function query(context, connection, queryString, rowProcessFunc) {
         }
         else {
             context.res = {
+                status: 200,
                 body: JSON.stringify(data),
                 headers: { "Content-Type": "application/json" }
             };
@@ -63,7 +79,8 @@ function query(context, connection, queryString, rowProcessFunc) {
 }
 
 module.exports = {
-    getConfig, getConfig,
-    error: error,
-    query, query
+    getConfig,
+    hookContextDoneWithConnectionClose,
+    error,
+    query
 }
