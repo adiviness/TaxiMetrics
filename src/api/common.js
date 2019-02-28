@@ -39,7 +39,6 @@ function error(err, context) {
 // data intended to be aggragated for context return.
 // Note : rowProcessFunc :: Row -> a
 function query(context, connection, queryString, rowProcessFunc) {
-    context.log(queryString);
     var Request = require('tedious').Request;
     data = [];
     var request = new Request(queryString, function(err, rowCount, rows) {

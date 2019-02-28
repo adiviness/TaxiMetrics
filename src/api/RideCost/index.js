@@ -61,11 +61,12 @@ module.exports = function (context, req) {
             common.error("can't build query", context);
             break;
         }
-            return `
-select ${table}.total_amount from ${table}
-join Zones a on ${table}.pickup_location_id = a.location_id
-join Zones b on ${table}.dropoff_location_id = b.location_id
-where a.Zone = '${req.query.pickup}' and b.Zone = '${req.query.dropoff}'`
+        return `
+select top 1000 total_amount from ${table}
+where pickup_location_id =
+(select top 1 location_id from Zones where Zones.zone = '${pickup}') AND
+dropoff_location_id =
+(select top  1 location_id from Zones where Zones.zone = '${dropoff}') `;
     }
 
     // Description:
