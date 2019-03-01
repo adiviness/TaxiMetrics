@@ -66,7 +66,7 @@ function query(context, connection, queryString, rowProcessFunc) {
         else {
             context.res = {
                 status: 200,
-                body: JSON.stringify(data),
+                body: data,
                 headers: { "Content-Type": "application/json" }
             };
             context.done();
