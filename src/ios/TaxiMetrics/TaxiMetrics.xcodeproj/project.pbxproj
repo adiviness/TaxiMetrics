@@ -13,6 +13,7 @@
 		7EA9FC23222902720000402D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7EA9FC22222902720000402D /* Assets.xcassets */; };
 		7EA9FC26222902720000402D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7EA9FC24222902720000402D /* LaunchScreen.storyboard */; };
 		7EA9FC31222902720000402D /* TaxiMetricsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA9FC30222902720000402D /* TaxiMetricsTests.swift */; };
+		7EA9FC3C222922D10000402D /* ApiInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA9FC3B222922D10000402D /* ApiInteraction.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		7EA9FC2C222902720000402D /* TaxiMetricsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TaxiMetricsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EA9FC30222902720000402D /* TaxiMetricsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaxiMetricsTests.swift; sourceTree = "<group>"; };
 		7EA9FC32222902720000402D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7EA9FC3B222922D10000402D /* ApiInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiInteraction.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 				7EA9FC1B222902710000402D /* AppDelegate.swift */,
 				7EA9FC1D222902710000402D /* ViewController.swift */,
 				7EA9FC1F222902710000402D /* Main.storyboard */,
+				7EA9FC3B222922D10000402D /* ApiInteraction.swift */,
 				7EA9FC22222902720000402D /* Assets.xcassets */,
 				7EA9FC24222902720000402D /* LaunchScreen.storyboard */,
 				7EA9FC27222902720000402D /* Info.plist */,
@@ -199,6 +202,7 @@
 			files = (
 				7EA9FC1E222902710000402D /* ViewController.swift in Sources */,
 				7EA9FC1C222902710000402D /* AppDelegate.swift in Sources */,
+				7EA9FC3C222922D10000402D /* ApiInteraction.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
