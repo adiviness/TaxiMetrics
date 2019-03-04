@@ -20,16 +20,19 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
     var zonesList = ["Astoria", "Chinatown", "Seattle", "Denver"];
     var activePickerSelectionType: ActivePickerSelectionType = .BoroughPickup;
 
+    var apiData: [String:[String]] = [:];
+    let api = ApiInteraction();
+
     enum ActivePickerSelectionType {
         case BoroughPickup
         case BoroughDropoff
         case ZonePickup
         case ZoneDropoff
     };
-    
 
     override func viewDidLoad() {
         super.viewDidLoad();
+        api.queryBoroughs(funcParam: handleBoroughListReceive);
 
         picker.isHidden = true;
         picker.delegate = self;
@@ -89,8 +92,23 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
             activePickerSelectionType == .BoroughDropoff) {
             return boroughsList[row];
         }
+        else if (activePickerSelectionType == .ZonePickup) {
+            let borough = boroughPickupTextField.text!;
+            if (apiData[borough] != nil) {
+                return apiData[borough]?[row];
+            }
+            else {
+                return "";
+            }
+        }
         else {
-            return zonesList[row];
+            let borough = boroughDropoffTextField.text!;
+            if (apiData[borough] != nil) {
+                return apiData[borough]?[row];
+            }
+            else {
+                return "";
+            }
         }
     }
 
@@ -101,18 +119,24 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
     // - row - the row index that was selected
     // - component - the component that was selected
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        print("picked");
         switch (activePickerSelectionType) {
         case .BoroughPickup:
             boroughPickupTextField.text = boroughsList[row];
+            fetchZoneData(borough: boroughsList[row]);
         case .BoroughDropoff:
             boroughDropoffTextField.text = boroughsList[row];
+            fetchZoneData(borough: boroughsList[row]);
         case .ZonePickup:
-            zonePickupTextField.text = zonesList[row];
+            let borough = boroughPickupTextField.text!;
+            if (apiData[borough] != nil) {
+                zonePickupTextField.text = apiData[borough]?[row];
+            }
         case .ZoneDropoff:
-            zoneDropoffTextField.text = zonesList[row];
-        default:
-            print("error");
-            // TODO proper error handling
+            let borough = boroughDropoffTextField.text!;
+            if (apiData[borough] != nil) {
+                zoneDropoffTextField.text = zonesList[row];
+            }
         };
         pickerView.isHidden = true;
     }
@@ -145,6 +169,30 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
         picker.reloadAllComponents();
         picker.isHidden = false;
         return false;
+    }
+
+    // Description:
+    // - replaces all data in boroughsList with data and continues api call chain
+    // Arguments:
+    // - data - data to fill boroughsList with
+    func handleBoroughListReceive(data: [String]) {
+        boroughsList = data;
+        for item in data {
+            apiData[item] = [];
+        }
+        for item in data {
+            print(item);
+            fetchZoneData(borough: item);
+        }
+    }
+
+    func fetchZoneData(borough: String) {
+        api.queryZones(borough: borough, funcParam: handleZoneData);
+    }
+
+    func handleZoneData(borough: String, data: [String]) {
+        apiData[borough] = data;
+        print ("here: \(borough)");
     }
 
 }

@@ -10,7 +10,7 @@ import Foundation
 
 class ApiInteraction {
     // api url
-    let rootUrl: String = "http://taxi-metrics-api-austdi.azurewebsites.net/api/";
+    let rootUrl: String = "https://taxi-metrics-api-austdi.azurewebsites.net/api/";
 
     // api function keys
     let apiKeys = [
@@ -18,5 +18,50 @@ class ApiInteraction {
         "Boroughs": "rH5EbDVFRn5l2Ve8mmc/Dp4XXdWSSOSGPfoQRb3TnhNLfjFApAS9yQ==",
         "RideCost": "/AvdQCN7NzNdMVf9IByAXRHx6rLGhAaGw6vI7FPX/pdC2wgKJD9uaQ=="
     ];
+
+    func queryBoroughs(funcParam: @escaping ([String]) -> Void) {
+        let apiKey: String = apiKeys["Boroughs"]!;
+        let url = URL(string: "\(rootUrl)boroughs?code=\(apiKey)")!;
+
+        httpQuery(url: url, funcParam: funcParam);
+    }
+
+    func queryZones(borough: String, funcParam: @escaping (String, [String]) -> Void) {
+        let apiKey: String = apiKeys["Zones"]!;
+        let urlString = "\(rootUrl)zones?borough=\(borough)&code=\(apiKey)";
+        guard let url = URL(string: urlString) else { return };
+
+        httpQuery(url: url, key: borough, funcParam: funcParam);
+    }
+
+    func httpQuery(url: URL, funcParam: @escaping ([String]) -> Void) {
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data else { return };
+            do {
+                let parsedData = try JSONSerialization.jsonObject(with: data) as! [String];
+                funcParam(parsedData);
+            }
+            catch let err {
+                print(err);
+            }
+        };
+        task.resume();
+    }
+
+    func httpQuery(url: URL, key: String, funcParam: @escaping (String, [String]) -> Void) {
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data else { return };
+            do {
+                let parsedData = try JSONSerialization.jsonObject(with: data) as! [String];
+                funcParam(key, parsedData);
+            }
+            catch let err {
+                print(err);
+            }
+        };
+        task.resume();
+    }
+
+
 
 }
