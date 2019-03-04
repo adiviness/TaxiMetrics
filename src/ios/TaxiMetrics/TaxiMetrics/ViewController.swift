@@ -8,6 +8,9 @@
 
 import UIKit
 
+// Commentary:
+// I'm not happy that I've shoved most everything into a single class here,
+// they should at least be pulled out into seperate logical sections.
 class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
 
     @IBOutlet var boroughPickupTextField: UITextField!;
@@ -15,14 +18,20 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
     @IBOutlet var boroughDropoffTextField: UITextField!;
     @IBOutlet var zoneDropoffTextField: UITextField!;
     @IBOutlet var picker: UIPickerView!;
+    @IBOutlet var taxiResultTextField: UITextField!;
 
-    var boroughsList = ["Manhattan", "Bronx", "Brooklyn", "Moon"];
-    var zonesList = ["Astoria", "Chinatown", "Seattle", "Denver"];
+    // current picker state
     var activePickerSelectionType: ActivePickerSelectionType = .BoroughPickup;
 
     var apiData: [String:[String]] = [:];
     let api = ApiInteraction();
 
+    var greenCost = 0.0;
+    var yellowCost = 0.0;
+
+    // Description:
+    // - these are the the possible states for the data the picker
+    // can be referring to.
     enum ActivePickerSelectionType {
         case BoroughPickup
         case BoroughDropoff
@@ -34,20 +43,25 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
         super.viewDidLoad();
         api.queryBoroughs(funcParam: handleBoroughListReceive);
 
+        // set picker up
         picker.isHidden = true;
         picker.delegate = self;
         picker.dataSource = self;
 
-        boroughPickupTextField.text = "blah";
+        // set text fields up
+        // Commentary: I assume that ios has a way to handle strings in a
+        // separate resource file like android. I don't plan of having any
+        // translations for this app so I'm not messing with it for now.
+        boroughPickupTextField.text = "Select";
         boroughPickupTextField.delegate = self;
 
-        zonePickupTextField.text = "zone pickup";
+        zonePickupTextField.text = "Select";
         zonePickupTextField.delegate = self;
 
-        boroughDropoffTextField.text = "borough dropoff";
+        boroughDropoffTextField.text = "Select";
         boroughDropoffTextField.delegate = self;
 
-        zoneDropoffTextField.text = "zone dropoff";
+        zoneDropoffTextField.text = "Select";
         zoneDropoffTextField.delegate = self;
     }
 
@@ -71,10 +85,12 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if (activePickerSelectionType == .BoroughPickup ||
             activePickerSelectionType == .BoroughDropoff) {
-            return boroughsList.count;
+            return apiData.keys.count;
         }
         else {
-            return zonesList.count;
+            // TODO query the borough list and pull the zone count out
+            //return zonesList.count;
+            return 10;
         }
     }
 
@@ -90,7 +106,8 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if (activePickerSelectionType == .BoroughPickup ||
             activePickerSelectionType == .BoroughDropoff) {
-            return boroughsList[row];
+            let keys = Array(apiData.keys);
+            return keys[row];
         }
         else if (activePickerSelectionType == .ZonePickup) {
             let borough = boroughPickupTextField.text!;
@@ -119,14 +136,15 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
     // - row - the row index that was selected
     // - component - the component that was selected
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        print("picked");
         switch (activePickerSelectionType) {
         case .BoroughPickup:
-            boroughPickupTextField.text = boroughsList[row];
-            fetchZoneData(borough: boroughsList[row]);
+            let keys: [String] = Array(apiData.keys);
+            boroughPickupTextField.text = keys[row];
+            fetchZoneData(borough: keys[row]);
         case .BoroughDropoff:
-            boroughDropoffTextField.text = boroughsList[row];
-            fetchZoneData(borough: boroughsList[row]);
+            let keys: [String] = Array(apiData.keys);
+            boroughDropoffTextField.text = keys[row];
+            fetchZoneData(borough: keys[row]);
         case .ZonePickup:
             let borough = boroughPickupTextField.text!;
             if (apiData[borough] != nil) {
@@ -135,7 +153,7 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
         case .ZoneDropoff:
             let borough = boroughDropoffTextField.text!;
             if (apiData[borough] != nil) {
-                zoneDropoffTextField.text = zonesList[row];
+                zoneDropoffTextField.text = apiData[borough]?[row];
             }
         };
         pickerView.isHidden = true;
@@ -176,7 +194,6 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
     // Arguments:
     // - data - data to fill boroughsList with
     func handleBoroughListReceive(data: [String]) {
-        boroughsList = data;
         for item in data {
             apiData[item] = [];
         }
@@ -186,14 +203,45 @@ class ViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegat
         }
     }
 
+    // Description:
+    // - starts an http api request to get zone listing for a borough
+    // Arguments:
+    // - borough - borough to get zones for
     func fetchZoneData(borough: String) {
         api.queryZones(borough: borough, funcParam: handleZoneData);
     }
 
+    // Description:
+    // - callback for zone api. places data in mapping to be used by picker.
+    // - borough - the borough that the zone data is associated with
+    // - data - the zone data from the request
     func handleZoneData(borough: String, data: [String]) {
         apiData[borough] = data;
-        print ("here: \(borough)");
     }
+
+    // Description:
+    // - starts api requests to calculate cheapest rides from supplied text fields
+    @IBAction
+    func buttonClicked(sender: UIButton) {
+        let pickup = zonePickupTextField.text!;
+        let dropoff = zoneDropoffTextField.text!;
+        api.queryRideCost(taxi: "green", pickup: pickup, dropoff: dropoff, funcParam: rideCostContinuation);
+    }
+
+    // Description:
+    // - continuation from green ride cost api request
+    // Arguments:
+    // - greenResults - costs of green taxi rides
+    func rideCostContinuation(greenResults: [String]) {
+        greenCost = 0.0;
+        for item in greenResults {
+            greenCost += Double(item)!;
+        }
+        greenCost /= Double(greenResults.count);
+        print(greenCost);
+        // TODO
+    }
+
 
 }
 
